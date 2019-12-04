@@ -25,9 +25,10 @@ server.get('/api/posts', (req, res) => {
 });
 
 server.get('/api/posts/:id', (req, res) => {
-    db.findById(req.params.id)
+    const id = req.params.id
+    db.findById(id)
         .then(post => {
-            if (post) {
+            if (post.length > 0) {
                 res.status(200).json(post);
             } else {
                 res.status(404).json({ message: 'Post not found' });
@@ -45,7 +46,7 @@ server.get('/api/posts/:id', (req, res) => {
 server.get('/api/posts/:id/comments', (req, res) => {
     db.findPostComments(req.params.id)
         .then(comments => {
-            if (comments) {
+            if (comments.length > 0) {
                 res.status(200).json(comments);
             } else {
                 res.status(404).json({ message: 'Posts comments not found' });
@@ -70,6 +71,20 @@ server.post('/api/posts', (req, res) => {
             console.log(error);
             res.status(500).json({
                 message: 'Error adding the post',
+            });
+        });
+});
+
+server.post('/api/posts/:id/comments', (req, res) => {
+    db.insertComment(req.body)
+        .then(comment => {
+            res.status(201).json(comment);
+        })
+        .catch(error => {
+            // log error to database
+            console.log(error);
+            res.status(500).json({
+                message: 'Error adding the comment',
             });
         });
 });
